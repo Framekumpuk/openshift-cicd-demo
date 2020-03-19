@@ -85,34 +85,6 @@ pipeline {
                             tag: env.TAG_NAME)
             }
         }
-        stage("Integration Test") {
-            agent {
-                kubernetes {
-                    cloud "openshift"
-                    defaultContainer "jnlp"
-                    label "${env.APP_NAME}-int-test"
-                    yaml """
-                        apiVersion: v1
-                        kind: Pod
-                        spec:
-                          containers:
-                          - name: python
-                            image: python:3
-                            command:
-                            - cat
-                            tty: true
-                    """                
-                }
-            }
-            steps {
-                unstash "repo"
-
-                container("python") {
-                    sh "pip install requests"
-                    sh "python ./src/test/python/it.py"
-                }
-            }
-        }
         stage("Deploy PROD (Blue)") {
             steps {
                 script {
